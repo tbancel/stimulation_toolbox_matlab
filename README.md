@@ -29,7 +29,7 @@ You are good to go !
 
 ## Useful documents:
 
-Highly recommended to read the full documentation here:
+The list of all needed softwares, drivers, and version is available in the full document. Explanation about how the code works is also provided. It is highly recommended to read all the document to have the whole picture of the whole project.
 
 - Full documentation [here](https://docs.google.com/document/d/1KSDnj4kaBZcaxWJyh2HyH4MV9eeVU_yVuVEYQM3cIAU/edit?usp=sharing)
 
