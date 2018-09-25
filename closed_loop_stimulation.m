@@ -1,10 +1,14 @@
-% full_script_closed_loop
-% TODO's:
-% BE ABLE TO CHANGE DURATION TIME OF PULSE
 clc; clear; close all;
 delete(timerfindall);
 
-cd('C:\Users\thomas.bancel\Documents\epilepsia_internship\closed_loop_recordings\');
+% create closed_loop_recordings folder if it does not exist
+root_folder = fileparts(which('stimulation_parameters.m'));
+cd(root_folder);
+if exist('closed_loop_recordings', 'dir') == 0;
+	mkdir('closed_loop_recordings');
+    addpath('closed_loop_recordings');
+end
+cd('closed_loop_recordings')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % GENERAL CONFIGURATION OF CLOSED LOOP %
@@ -51,6 +55,8 @@ plot(recording_baseline.realtime, recording_baseline.realdata);
 xlabel("Time (s)");
 title(strcat("Channel CED Analysis: ", num2str(recording_baseline.sampled_channel)));
 saveas(f1,strcat(f1.Name, '.png'), 'png');
+
+close f;
 
 % warn user that baseline recording has finished (with a song)
 % and ask the user for baseline labelling:
@@ -114,29 +120,30 @@ recording_stimulation.sampled_channel = output_stimulation.sampled_channel;
 
 recording_stimulation.mean_baseline_ll = output_stimulation.norm_baseline;
 recording_stimulation.f_line_length = output_stimulation.f_line_length;
+
 recording_stimulation.seizures = output_stimulation.seizures;
+
 recording_stimulation.executed_stimulation_times = executed_stimulation_times;
 recording_stimulation.threshold_value_nf_ll = output_stimulation.threshold_value_nf_ll;
 recording_stimulation.model_description = str_description;
 
+% add the seizure info matrix in the structure
+recording_stimulation.seizure_info = compute_rt_detected_seizure_info(recording_stimulation);
+
+% resample the data to have a uniform linear time vector:
+[timevector, value, interval] = resample_matlab_recording(recording_stimulation);
+recording_stimulation.timevector = timevector;
+recordingt_stimulation.values = values;
+
 save(str_filename, 'recording_stimulation');
 
-plot(recording_stimulation.realtime, recording_stimulation.realdata);
-% delete(timerfindall);
-
 % plotting the recording with stimulations
-% plot the stimulation and the realdata and saves it
-f2=figure(2);
-f2.Name = strcat(str_filename);
-plot(recording_stimulation.realtime, recording_stimulation.realdata);
-xlabel("Time (s)");
-title(strcat("Channel CED Analysis: ", num2str(recording_stimulation.sampled_channel)));
-for i=1:numel(executed_stimulation_times)
-    vline(executed_stimulation_times(1,i), 'r')
-end
-saveas(f2,strcat(f2.Name, '.png'), 'png');
-
+% plot the stimulation and the realdata and saves i
+visualize_matlab_recording_with_seizure(recording_stimulation);
+visualize_matlab_recording_with_stimulation(recording_stimulation);
 
 % 
 % End of stimulation
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+cd(root_folder);

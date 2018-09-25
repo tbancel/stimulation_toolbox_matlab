@@ -1,4 +1,4 @@
-function f = visualize_matlab_stimulation_recording(recording)
+function f = visualize_matlab_recording_with_stimulation(recording)
 	% plot the recording from matlab sampling
 
 	n_figures=size(findobj('type','figure'), 1);

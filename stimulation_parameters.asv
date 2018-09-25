@@ -21,7 +21,7 @@ global AMPI_channel_recording_ends;
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%
-% 2.recording parameters
+% 1.recording parameters
 
 baseline_recording_time = 30; % number of minutes to record
 stimulation_recording_time = 180; % number of minutes with stimulation on
