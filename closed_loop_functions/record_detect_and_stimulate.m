@@ -1,6 +1,7 @@
 function output = record_detect_and_stimulate(channel_to_sample, sampling_rate_ced, approx_epoch_timelength, stimulation_recording_time,  norm_baseline, threshold_value_nf_ll, stim_param)
     % script which is called from closed loop
     global executed_stimulation_times;
+    global Master8;
 
     %%% SCRIPT RUNNING
     fs = sampling_rate_ced;
@@ -62,6 +63,7 @@ function output = record_detect_and_stimulate(channel_to_sample, sampling_rate_c
     t = datetime('now');
     timestr = strcat(num2str(yyyymmdd(t)), '_', num2str(t.Hour), '_', num2str(t.Minute));
     d_wave_timestamps = [];
+    p_wave_timestamps = [];
 
     % Launch the sampling
     for i=1:number_of_loops
@@ -90,14 +92,15 @@ function output = record_detect_and_stimulate(channel_to_sample, sampling_rate_c
 
                switch stim_param.stimulation_position
                    case 'w'
-                    output_stimulation = find_waves_and_stimulate(fs, sampled_time, sampled_data, Master8, seizures, stim_param, d_wave_timestamps);
+                    output_stimulation = find_waves_and_stimulate(fs, sampled_time, sampled_data, seizures, stim_param, d_wave_timestamps, p_wave_timestamps);
                     d_wave_timestamps = output_stimulation.d_wave_timestamps;
+                    p_wave_timestamps = output_stimulation.p_wave_timestamps;
                     internal_frequency(i-1,1) = output_stimulation.internal_frequency;
                    case 's'
                     % todo not precise enough at the moment
                    case 'asap'
                     Master8.Trigger(3);
-                    executed_stimulation_times = [executed_stimulation_times; toc];
+                    executed_stimulation_times = [executed_stimulation_times toc];
                 end
             else
                 seizures(i-1,1)=0;
@@ -166,18 +169,14 @@ function output = record_detect_and_stimulate(channel_to_sample, sampling_rate_c
 
     if exist('output_stimulation')
         output.d_wave_timestamps = output_stimulation.d_wave_timestamps;
+        output.p_wave_timestamps = output_stimulation.p_wave_timestamps;
     else
         output.d_wave_timestamps = [];
+        output.p_wave_timestamps = [];
     end
 
     % wait for all timers to execute
     pause(1);
     output.stimulation_timestamps = executed_stimulation_times;
 
-    % stim_vector = zeros(1,size(realtime, 2));
-    % for i=1:size(stimulation_times, 2)
-    %     start_stim_index = min(find(realtime > stimulation_times(1,i)));
-    %     end_stim_index = max(find(realtime < stimulation_times(1,i)+ stimulation_duration));
-    %     stim_vector(1,start_stim_index:end_stim_index)=1;
-    % end
 end

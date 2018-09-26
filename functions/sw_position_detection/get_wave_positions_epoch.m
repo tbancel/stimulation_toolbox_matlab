@@ -1,14 +1,15 @@
 function output = get_wave_positions_epoch(epoch_signal, epoch_time, fs)
 	% crucial feature
-	% we take the last epochs only and analyze the position of the wave
+	% we take the last sampled epoch, extract the position of the waves and predict the position of the following ones.
 
 	% Output : 
-	% output.d_wave_timestamps = 1xN array where each value is the timestamps of the detected waves.
-	% output.p_wave_timestamps = 1xN array where each value is the timestamps of the predicted waves.
+	% output.d_wave_timestamps = 1xN array where each value is the timestamps of the detected waves in the epoch of analysis.
+	% output.p_wave_timestamps = 1xN array where each value is the timestamps of the predicted waves during the next epoch.
 	% output.internal_frequency = detected frequency in the epoch
 	% output.spike_orientation = 'up' or 'down'
 
     time_n = epoch_time;
+    epoch_duration = 1/fs*numel(time_n); 
 
 	% filter signal between 0.1 and 40 Hz
     [b, a] = butter(2, 2/fs*[0.1 40], 'bandpass');
@@ -97,9 +98,23 @@ function output = get_wave_positions_epoch(epoch_signal, epoch_time, fs)
         if ~isempty(wave_locs)
             wave_locs = wave_locs(1,1);
             d_wave_timestamps = [d_wave_timestamps epoch_time(windows(1, wave_windows_index(i))+wave_locs)];
-            p_wave_timestamps = 1/internal_frequency + d_wave_timestamps;
+            % p_wave_timestamps = 1/internal_frequency + d_wave_timestamps;
         end
     end
+
+    % create predicted timestamps which are in the current epoch of analysis.
+    next_window = max(time_n) + [0 epoch_duration];
+    disp(num2str(next_window));
+    last_detected_wave_timestamp = max(d_wave_timestamps);
+    for i=1:floor(2*epoch_duration*internal_frequency)
+        disp(num2str(i))
+        p_wave_timestamp = last_detected_wave_timestamp + i*1/internal_frequency;
+        disp(num2str(p_wave_timestamp))
+        if (p_wave_timestamp < max(next_window)) && (p_wave_timestamp > min(next_window))
+            p_wave_timestamps = [p_wave_timestamps p_wave_timestamp];
+        end
+    end
+
 
     % set output structure:
     output.epoch_time = time_n;

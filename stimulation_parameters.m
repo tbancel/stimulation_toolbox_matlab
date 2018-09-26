@@ -14,10 +14,10 @@ global stimulation_duration;
 global planned_stimulation_times;
 global executed_stimulation_times;
 
-global AMPI_paradigm;
-global AMPI_channel_stimulation;
-global AMPI_channel_recording_starts;
-global AMPI_channel_recording_ends;
+global AMPI_paradigm; % not used yet
+global AMPI_channel_stimulation; % not used yet
+global AMPI_channel_recording_starts; % not used yet
+global AMPI_channel_recording_ends; % not used yet
 
 planned_stimulation_times = [];
 executed_stimulation_times = [];
@@ -26,8 +26,8 @@ executed_stimulation_times = [];
 %%%%%%%%%%%%%%%%%%%%%%%%
 % 1.recording parameters
 
-baseline_recording_time = 30; % number of minutes to record
-stimulation_recording_time = 180; % number of minutes with stimulation on
+baseline_recording_time = 30; % number of seconds to record for baseline
+stimulation_recording_time = 600; % number of seconds with stimulation on
 approx_epoch_timelength = 0.2; % 200ms the CED will sample every XX seconds
 sampling_rate_ced = 1000; % in Hz /!\ be careful, period must be a multiple of the clock period.
 channel_to_sample = 4; % channel of the CED that is sampled (ADC: analog to digital converter) and send to the computer
@@ -41,7 +41,7 @@ threshold_value_nf_ll = 1.57; % threshold value
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%
-% 3. stimulation parameters / ├а developper plus tard.
+% 3. stimulation parameters / ра developper plus tard.
 
 % position of the 
 % possible values are : 

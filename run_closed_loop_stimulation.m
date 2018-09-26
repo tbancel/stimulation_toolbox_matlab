@@ -54,7 +54,6 @@ f1.Name = strcat(recording_baseline.filename);
 plot(recording_baseline.realtime, recording_baseline.realdata);
 xlabel("Time (s)");
 title(strcat("Channel CED Analysis: ", num2str(recording_baseline.sampled_channel)));
-saveas(f1,strcat(f1.Name, '.png'), 'png');
 
 % warn user that baseline recording has finished (with a song)
 % and ask the user for baseline labelling:
@@ -70,6 +69,7 @@ baseline = [start_baseline end_baseline];
 
 recording_baseline.baseline = baseline;
 save(str_filename, 'recording_baseline');
+close all;
 
 %%%
 % compute normalized line length during baseline:
@@ -79,7 +79,6 @@ index_last_epoch_in_baseline = max(find(recording_baseline.sampled_time(:,1) < e
 ll_baseline = feature_line_length(recording_baseline.sampled_data(index_first_epoch_in_baseline:index_last_epoch_in_baseline,:));
 mean_ll = mean(ll_baseline);
 disp(strcat('Mean line length for baseline : ', num2str(mean_ll)));
-close all;
 
 %
 % End of baseline recording
@@ -127,18 +126,24 @@ recording_stimulation.model_description = str_description;
 
 % add the seizure info matrix in the structure
 recording_stimulation.seizure_info = compute_rt_detected_seizure_info(recording_stimulation);
+recording_stimulation.epoch_internal_frequency = output_stimulation.internal_frequency;
 
 % resample the data to have a uniform linear time vector:
-[timevector, value, interval] = resample_matlab_recording(recording_stimulation);
+[timevector, values, interval] = resample_matlab_recording(recording_stimulation);
 recording_stimulation.timevector = timevector;
-recordingt_stimulation.values = values;
+recording_stimulation.values = values;
+
+% include detected and predicted wave timestamps:
+recording_stimulation.d_wave_timestamps = output_stimulation.d_wave_timestamps;
+recording_stimulation.p_wave_timestamps = output_stimulation.p_wave_timestamps;
 
 save(str_filename, 'recording_stimulation');
 
 % plotting the recording with stimulations
 % plot the stimulation and the realdata and saves i
 visualize_matlab_recording_with_seizure(recording_stimulation);
-visualize_matlab_recording_with_stimulation(recording_stimulation);
+% visualize_matlab_recording_with_stimulation(recording_stimulation);
+visualize_matlab_recording_with_stimulation_and_predicted(recording_stimulation);
 
 % 
 % End of stimulation
